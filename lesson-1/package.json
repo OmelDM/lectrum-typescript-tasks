@@ -1,0 +1,15 @@
+{
+  "name": "lesson-1",
+  "version": "1.0.0",
+  "description": "Lesson 1",
+  "repository": "https://github.com/OmelDM/lectrum-typescript-tasks",
+  "main": "index.ts",
+  "scripts": {
+    "compile": "tsc ./source.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^3.8.2"
+  }
+}
