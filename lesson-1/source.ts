@@ -20,6 +20,27 @@ const rounding: RoundingFnType = (value, increment) => round(value / increment) 
 const groupRegex = /(\d)(?=(\d{3})+\b)/g;
 const vedicRegex = /(\d)(?=(\d\d)+\d\b)/g;
 
+type ParseType = ICurrency | number | string;
+
+interface ICurrency {
+    readonly dollar: number;
+    readonly cents: number;
+
+    add(value: ParseType): ICurrency;
+    subtract(value: ParseType): ICurrency;
+    multiply(value: ParseType): ICurrency;
+    divide(value: ParseType): ICurrency;
+
+    distribute(count: number): ReadonlyArray<ICurrency>;
+    format(useSymbol: boolean): string;
+    toString(): string;
+    toJSON(): number;
+}
+
+class Currency {
+
+}
+
 /**
  * Create a new instance of currency.js
  * @param {number|string|currency} value
