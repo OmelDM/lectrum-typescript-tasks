@@ -9,9 +9,13 @@ const defaults = {
     negativePattern: '-!#'
 };
 
-const round = v => Math.round(v);
-const pow = p => Math.pow(10, p);
-const rounding = (value, increment) => round(value / increment) * increment;
+type RoundFnType = (n: number) => number;
+type PowFnType = (n: number) => number;
+type RoundingFnType = (v: number, inc: number) => number;
+
+const round: RoundFnType = v => Math.round(v);
+const pow: PowFnType = p => Math.pow(10, p);
+const rounding: RoundingFnType = (value, increment) => round(value / increment) * increment;
 
 const groupRegex = /(\d)(?=(\d{3})+\b)/g;
 const vedicRegex = /(\d)(?=(\d\d)+\d\b)/g;
