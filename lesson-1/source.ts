@@ -1,4 +1,4 @@
-const defaults = {
+const defaults: CurrencyOptions = {
     symbol: '$',
     separator: ',',
     decimal: '.',
@@ -6,7 +6,10 @@ const defaults = {
     errorOnInvalid: false,
     precision: 2,
     pattern: '!#',
-    negativePattern: '-!#'
+    negativePattern: '-!#',
+    increment: 1 / 2,
+    groups: null,
+    useVedic: false,
 };
 
 type RoundFnType = (n: number) => number;
@@ -20,16 +23,34 @@ const rounding: RoundingFnType = (value, increment) => round(value / increment) 
 const groupRegex = /(\d)(?=(\d{3})+\b)/g;
 const vedicRegex = /(\d)(?=(\d\d)+\d\b)/g;
 
-type ParseType = ICurrency | number | string;
+interface CurrencyOptions {
+    readonly symbol: string;
+    readonly separator: string;
+    readonly decimal: string;
+    readonly formatWithSymbol: boolean;
+    readonly errorOnInvalid: boolean;
+    readonly precision: number;
+    readonly pattern: string;
+    readonly negativePattern: string;
+    readonly increment: number;
+    readonly groups: RegExp;
+    readonly useVedic: boolean;
+}
+
+type InputCurrencyType = ICurrency | number | string;
+
+interface CurrencyConstructor {
+    new(value: InputCurrencyType, opts?: CurrencyOptions): ICurrency;
+}
 
 interface ICurrency {
     readonly dollar: number;
     readonly cents: number;
 
-    add(value: ParseType): ICurrency;
-    subtract(value: ParseType): ICurrency;
-    multiply(value: ParseType): ICurrency;
-    divide(value: ParseType): ICurrency;
+    add(value: InputCurrencyType): ICurrency;
+    subtract(value: InputCurrencyType): ICurrency;
+    multiply(value: InputCurrencyType): ICurrency;
+    divide(value: InputCurrencyType): ICurrency;
 
     distribute(count: number): ReadonlyArray<ICurrency>;
     format(useSymbol: boolean): string;
@@ -37,9 +58,37 @@ interface ICurrency {
     toJSON(): number;
 }
 
-class Currency {
+class Currency implements ICurrency {
+    private readonly settings: CurrencyOptions;
+    private precision: number;
 
+    constructor(value: InputCurrencyType, opts?: CurrencyOptions) {
+        this.settings = this.setupSettings(defaults, opts)
+    }
+
+    private readonly setupSettings = (defaultSettings: CurrencyOptions, inputSettings?: CurrencyOptions): CurrencyOptions => {
+        let resultSettings = {...defaultSettings, ...inputSettings};
+        const precision = pow(resultSettings.precision);
+        resultSettings = {...resultSettings, increment: resultSettings.increment || (1 / precision)};
+        resultSettings = {...resultSettings, groups: resultSettings.useVedic ? vedicRegex : groupRegex};
+
+        return resultSettings;
+    }
 }
+
+// const Currency = function(this: ICurrency, value: InputCurrencyType, opts?: CurrencyOptions) {
+//     const setupSettings = (defaultSettings: CurrencyOptions, inputSettings?: CurrencyOptions): CurrencyOptions => {
+//         let resultSettings = {...defaultSettings, ...inputSettings};
+//         const precision = pow(resultSettings.precision);
+//         resultSettings = {...resultSettings, increment: resultSettings.increment || (1 / precision)};
+//         resultSettings = {...resultSettings, groups: resultSettings.useVedic ? vedicRegex : groupRegex};
+//
+//         return resultSettings;
+//     }
+//
+//     this.settings = setupSettings(defaults, opts);
+//
+// } as Function as CurrencyConstructor;
 
 /**
  * Create a new instance of currency.js
@@ -228,3 +277,9 @@ currency.prototype = {
 };
 
 export default currency;
+
+//////////////////////////////
+
+const ccc = new Currency(22);
+
+ccc.
